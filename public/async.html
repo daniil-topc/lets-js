@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Асинхронность — let's JS</title>
+  <meta name="description" content="Асинхронный JavaScript: setTimeout, setInterval, промисы, async / await и fetch с реальными примерами.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <script src="js/theme-init.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's JS — на главную"><span class="logo__kw">let</span>'s <span class="logo__js">JS</span></a>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="basics.html">Основы</a>
+        <a href="control.html">Условия и циклы</a>
+        <a href="functions.html">Функции</a>
+        <a href="data.html">Массивы и объекты</a>
+        <a href="dom.html">DOM</a>
+        <a href="async.html">Асинхронность</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg></span>
+        <p class="eyebrow">Глава 06</p>
+      </div>
+      <h1>Асинхронность</h1>
+      <p class="lead">Обычно JavaScript выполняет код по порядку, строку за строкой. Но некоторые дела занимают время: таймер должен досчитать, сервер должен ответить. Если бы страница замирала на эти секунды, пользоваться ей было бы невозможно. Асинхронный код ждёт в фоне, а страница продолжает работать.</p>
+
+      <section id="settimeout">
+        <h2>setTimeout()</h2>
+        <p><code>setTimeout</code> работает как будильник. Ты говоришь, что сделать и через сколько, и JavaScript выполнит это один раз, когда время выйдет. Время пишется в миллисекундах: 1000 миллисекунд равны одной секунде.</p>
+<pre><code class="js">//         что сделать            через сколько мс
+setTimeout(() => {
+  console.log('Прошло 2 секунды');
+}, 2000);
+
+// Таймер можно отменить, пока он не сработал
+const timerId = setTimeout(() => {
+  console.log('Этого никто не увидит');
+}, 5000);
+
+clearTimeout(timerId);</code></pre>
+        <div class="note">
+          <p>Код, который стоит после <code>setTimeout</code>, таймера не ждёт и выполняется сразу. Функция внутри сработает позже, когда выйдет время.</p>
+        </div>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Уведомление, которое исчезает само</h3>
+          <p>Плашка «Товар добавлен в корзину» появляется сразу после клика и через 3 секунды исчезает сама. Убирает её <code>setTimeout</code>.</p>
+<pre><code class="js">const button = document.querySelector('.add-to-cart');
+const toast = document.querySelector('.toast');
+let timerId;
+
+button.addEventListener('click', () => {
+  toast.classList.add('is-visible');
+
+  clearTimeout(timerId); // если нажали ещё раз — отсчёт заново
+  timerId = setTimeout(() => {
+    toast.classList.remove('is-visible');
+  }, 3000);
+});</code></pre>
+          <div class="demo" data-demo="toast">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <button class="btn btn--primary btn--sm" type="button">Добавить в корзину</button>
+            </div>
+            <div class="toast" role="status">✓ Товар добавлен в корзину</div>
+          </div>
+        </div>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Поиск, который не дёргает сервер на каждую букву</h3>
+          <p>Если отправлять запрос на сервер после каждой буквы, слово «Москва» даст шесть запросов, и пять из них лишние. Есть приём под названием debounce: каждая новая буква отменяет прошлый таймер и заводит новый. Поиск запускается, когда человек перестал печатать на полсекунды.</p>
+<pre><code class="js">const input = document.querySelector('#search');
+let timerId;
+
+input.addEventListener('input', () => {
+  clearTimeout(timerId);        // отменяем прошлый запуск
+  timerId = setTimeout(() => {
+    search(input.value);        // ищем через 500 мс тишины
+  }, 500);
+});</code></pre>
+          <div class="demo" data-demo="debounce">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <input class="input" type="text" placeholder="Город: попробуй «Мо» или «Са»" maxlength="30" aria-label="Поиск города">
+            </div>
+            <p class="demo__out" aria-live="polite">Введи первые буквы города</p>
+            <p class="demo__out">Поисков выполнено: <strong data-role="count">0</strong>. Печатай быстро, и число почти не вырастет.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="setinterval">
+        <h2>setInterval()</h2>
+        <p><code>setInterval</code> похож на <code>setTimeout</code>, только срабатывает снова и снова через равные промежутки времени. Так тикают часы на сайте и идёт обратный отсчёт. Сам он не остановится, поэтому, когда повторы больше не нужны, вызови <code>clearInterval</code>.</p>
+<pre><code class="js">let seconds = 0;
+
+const timerId = setInterval(() => {
+  seconds++;
+  console.log(`Прошло секунд: ${seconds}`);
+
+  if (seconds === 5) {
+    clearInterval(timerId); // обязательно останавливаем
+  }
+}, 1000);</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>«Отправить код повторно через 10 с»</h3>
+          <p>При входе по SMS кнопка «Отправить код» блокируется на несколько секунд, а надпись рядом показывает, сколько осталось ждать. Надпись раз в секунду обновляет <code>setInterval</code>.</p>
+<pre><code class="js">function startCountdown(button, label) {
+  let seconds = 10;
+  button.disabled = true;
+
+  const timerId = setInterval(() => {
+    seconds--;
+    label.textContent = `Повторить можно через ${seconds} с`;
+
+    if (seconds === 0) {
+      clearInterval(timerId);
+      button.disabled = false;
+      label.textContent = 'Можно отправить код ещё раз';
+    }
+  }, 1000);
+}</code></pre>
+          <div class="demo" data-demo="countdown">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <button class="btn btn--primary btn--sm" type="button">Отправить код</button>
+            </div>
+            <p class="demo__out" aria-live="polite">Нажми кнопку, чтобы «получить SMS»</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="promise">
+        <h2>Промисы</h2>
+        <p>В кафе тебе дают номерок: заказ ещё не готов, но его принесут. Промис в JavaScript работает как этот номерок. Результата пока нет, а объект, который его обещает, уже у тебя. Дальше возможны два исхода: заказ принесли или на кухне что-то пошло не так. На первый случай подписываются через <code>.then()</code>, на второй через <code>.catch()</code>.</p>
+<pre><code class="js">// Функция, которая «ждёт» указанное время
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+wait(1000)
+  .then(() => {
+    console.log('Прошла секунда');
+  })
+  .catch((error) => {
+    console.log('Что-то пошло не так', error);
+  });</code></pre>
+      </section>
+
+      <section id="async-await">
+        <h2>async / await</h2>
+        <p>Цепочки из <code>.then()</code> быстро становятся длинными. Слова <code>async</code> и <code>await</code> позволяют записать то же самое проще. <code>await</code> ставит функцию на паузу, пока промис не выполнится, и код читается сверху вниз, как обычный.</p>
+<pre><code class="js">async function showMessages() {
+  console.log('Загрузка…');
+  await wait(1000);          // ждём секунду
+  console.log('Готово!');
+}
+
+showMessages();</code></pre>
+        <p>Кнопка запускает функцию с <code>await wait(2000)</code>. Пока она ждёт, страница не зависает: попробуй прокрутить её или выделить текст.</p>
+        <div class="demo" data-demo="wait">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <button class="btn btn--primary btn--sm" type="button">Запустить showMessages()</button>
+          </div>
+          <p class="demo__out" aria-live="polite">Функция ещё не запущена</p>
+        </div>
+        <div class="note">
+          <p><code>await</code> работает только внутри функции, перед которой написано <code>async</code>. Ошибки ловят блоком <code>try...catch</code>.</p>
+        </div>
+      </section>
+
+      <section id="fetch">
+        <h2>fetch()</h2>
+        <p><code>fetch</code> отправляет запрос на сервер и возвращает промис с ответом. Благодаря ему сайты подгружают ленту, комментарии или курс валют без перезагрузки страницы. Ответ обычно приходит в формате JSON, и метод <code>response.json()</code> превращает его в объект.</p>
+<pre><code class="js">async function loadUser() {
+  try {
+    const response = await fetch('/api/user');
+
+    if (!response.ok) {
+      throw new Error(`Ошибка: ${response.status}`);
+    }
+
+    const user = await response.json(); // JSON → объект
+    console.log(user.name);
+  } catch (error) {
+    console.log('Не удалось загрузить данные');
+  }
+}</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Загрузка данных с сервера по кнопке</h3>
+          <p>Кнопка ниже отправляет настоящий запрос серверу этого сайта. Сервер написан на Node.js и по адресу <code>/api/tip</code> отдаёт случайный совет в формате JSON. В коде три шага: показать «Загрузка…», получить ответ и обработать ошибку, если сеть подвела.</p>
+<pre><code class="js">const button = document.querySelector('button');
+const output = document.querySelector('.output');
+
+button.addEventListener('click', async () => {
+  button.disabled = true;
+  output.textContent = 'Загрузка…';
+
+  try {
+    const response = await fetch('/api/tip');
+    if (!response.ok) throw new Error(response.status);
+
+    const tip = await response.json();
+    output.textContent = `Совет №${tip.id}: ${tip.text}`;
+  } catch (error) {
+    output.textContent = 'Не удалось загрузить совет';
+  } finally {
+    button.disabled = false; // выполнится в любом случае
+  }
+});</code></pre>
+          <div class="demo" data-demo="fetch">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <button class="btn btn--primary btn--sm" type="button">Получить совет</button>
+            </div>
+            <p class="demo__out" aria-live="polite">Нажми кнопку, и совет придёт с сервера</p>
+          </div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="dom.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>DOM и события</a>
+        <a class="pager__next" href="index.html"><span>Готово <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>На главную</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's JS</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/demos.js"></script>
+</body>
+</html>

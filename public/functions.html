@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Функции — let's JS</title>
+  <meta name="description" content="Функции в JavaScript: объявление, параметры, return, стрелочные функции и область видимости с примерами.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <script src="js/theme-init.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's JS — на главную"><span class="logo__kw">let</span>'s <span class="logo__js">JS</span></a>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="basics.html">Основы</a>
+        <a href="control.html">Условия и циклы</a>
+        <a href="functions.html">Функции</a>
+        <a href="data.html">Массивы и объекты</a>
+        <a href="dom.html">DOM</a>
+        <a href="async.html">Асинхронность</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M9 17c2 0 2.8-1 2.8-2.8V10c0-2 1-3.3 3.2-3"/><path d="M9 11.2h5.7"/></svg></span>
+        <p class="eyebrow">Глава 03</p>
+      </div>
+      <h1>Функции</h1>
+      <p class="lead">Допустим, один и тот же кусок кода нужен тебе в пяти местах. Копировать его пять раз плохая идея: найдёшь ошибку и будешь править все пять копий. Функция решает эту проблему. Ты пишешь код один раз, даёшь ему имя и потом вызываешь по имени.</p>
+
+      <section id="declaration">
+        <h2>Объявление и вызов</h2>
+        <p>Функция похожа на рецепт. Записать рецепт в тетрадь и приготовить по нему блюдо можно в разные дни. С функцией так же: сначала её объявляют (записывают рецепт), потом вызывают (готовят). Вызов выглядит как имя и круглые скобки после него. Без скобок ничего не произойдёт.</p>
+<pre><code class="js">// Объявление
+function sayHello() {
+  console.log('Привет!');
+}
+
+// Вызов
+sayHello(); // Привет!
+sayHello(); // Привет! — можно сколько угодно раз</code></pre>
+        <p>Каждое нажатие кнопки вызывает функцию заново.</p>
+        <div class="demo" data-demo="hello">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <button class="btn btn--primary btn--sm" type="button">sayHello()</button>
+          </div>
+          <p class="demo__out" aria-live="polite">Функция объявлена, но её ещё ни разу не вызвали</p>
+        </div>
+      </section>
+
+      <section id="params">
+        <h2>Параметры и return</h2>
+        <p>Рецепту нужны продукты, а функции нужны данные. Их передают в круглых скобках, и называются они параметрами. Результат функция отдаёт словом <code>return</code>. После <code>return</code> функция сразу заканчивается, и значение попадает туда, где её вызвали.</p>
+        <p>Параметру можно задать значение по умолчанию. Оно пригодится, если при вызове данные не передали.</p>
+<pre><code class="js">function sum(a, b) {
+  return a + b;
+}
+
+const total = sum(2, 3); // 5
+
+// Значение по умолчанию — если аргумент не передали
+function greet(name = 'гость') {
+  return `Привет, ${name}!`;
+}
+
+greet('Аня'); // 'Привет, Аня!'
+greet();      // 'Привет, гость!'</code></pre>
+        <div class="note">
+          <p><code>console.log()</code> только печатает значение в консоль, использовать его дальше нельзя. Если результат нужен в другом месте программы, верни его через <code>return</code>.</p>
+        </div>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Цена со скидкой в интернет-магазине</h3>
+          <p>Скидку в магазине считают в карточке товара, в корзине и в чеке. Формула при этом одна, и лежит она в одной функции. Когда маркетологи поменяют правила, программист исправит одно место.</p>
+<pre><code class="js">function getFinalPrice(price, discount = 0) {
+  return Math.round(price - (price * discount) / 100);
+}
+
+getFinalPrice(7900, 15); // 6715
+getFinalPrice(7900);     // 7900 — скидки нет</code></pre>
+          <div class="demo" data-demo="price">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <input class="input" data-role="price" type="number" value="7900" min="0" max="1000000" aria-label="Цена">
+              <select class="input" data-role="discount" aria-label="Скидка">
+                <option value="0">Без скидки</option>
+                <option value="10">Скидка 10%</option>
+                <option value="15" selected>Скидка 15%</option>
+                <option value="50">Скидка 50%</option>
+              </select>
+            </div>
+            <p class="demo__out" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="arrow">
+        <h2>Стрелочные функции</h2>
+        <p>У функции есть короткая запись со стрелкой <code>=></code>. Работает она так же, только писать меньше. Стрелочные функции чаще всего передают внутрь других функций, например в обработчик клика или в методы массивов. В следующих главах ты увидишь их постоянно.</p>
+<pre><code class="js">// Обычная функция
+function double(n) {
+  return n * 2;
+}
+
+// То же самое стрелкой
+const double2 = (n) => {
+  return n * 2;
+};
+
+// Если тело — одно выражение, скобки и return не нужны
+const double3 = (n) => n * 2;
+
+double3(4); // 8</code></pre>
+        <p>Функция <code>double</code> из примера работает прямо здесь. Поменяй число.</p>
+        <div class="demo" data-demo="double">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <label for="doubleInput">n =</label>
+            <input class="input input--sm" id="doubleInput" type="number" value="4" min="-100000" max="100000">
+          </div>
+          <p class="demo__out" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section id="scope">
+        <h2>Область видимости</h2>
+        <p>Переменная живёт внутри тех фигурных скобок, где её создали. Снаружи её не видно. Это как комнаты в квартире: то, что лежит в твоей комнате, из коридора не достать, зато всё, что стоит в коридоре, доступно из любой комнаты.</p>
+<pre><code class="js">const site = "let's JS"; // видна везде
+
+function showInfo() {
+  const secret = 42;     // видна только внутри функции
+  console.log(site);     // работает
+  console.log(secret);   // работает
+}
+
+showInfo();
+console.log(secret); // Ошибка: secret is not defined</code></pre>
+        <div class="note">
+          <p>Благодаря этому функции не мешают друг другу. В двух разных функциях могут быть переменные с одинаковым именем, и они не перепутаются.</p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="control.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>Условия и циклы</a>
+        <a class="pager__next" href="data.html"><span>Дальше <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>Массивы и объекты</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's JS</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/demos.js"></script>
+</body>
+</html>

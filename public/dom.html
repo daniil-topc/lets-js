@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DOM и события — let's JS</title>
+  <meta name="description" content="DOM в JavaScript: querySelector, изменение элементов, classList, события и создание элементов с примерами.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <script src="js/theme-init.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's JS — на главную"><span class="logo__kw">let</span>'s <span class="logo__js">JS</span></a>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="basics.html">Основы</a>
+        <a href="control.html">Условия и циклы</a>
+        <a href="functions.html">Функции</a>
+        <a href="data.html">Массивы и объекты</a>
+        <a href="dom.html">DOM</a>
+        <a href="async.html">Асинхронность</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/></svg></span>
+        <p class="eyebrow">Глава 05</p>
+      </div>
+      <h1>DOM и события</h1>
+      <p class="lead">До этой главы код только считал и выводил результат в консоль. Теперь он будет менять саму страницу. Браузер представляет каждый тег HTML в виде объекта, и вместе эти объекты называются DOM. Через них JavaScript находит элементы, меняет их и удаляет.</p>
+
+      <section id="select">
+        <h2>Поиск элементов</h2>
+        <p>Чтобы изменить элемент, его нужно сначала найти. Команда <code>document.querySelector</code> ищет на странице первый элемент, который подходит под описание. Описание пишется так же, как селектор в CSS: <code>'h1'</code> для тега, <code>'.btn'</code> для класса, <code>'#signup'</code> для id.</p>
+        <p>Если нужны все подходящие элементы, бери <code>querySelectorAll</code>. Он вернёт список.</p>
+<pre><code class="js">// Первый подходящий элемент
+const title = document.querySelector('h1');
+const button = document.querySelector('.btn');
+const form = document.querySelector('#signup');
+
+// Все подходящие — получится список
+const cards = document.querySelectorAll('.card');
+
+cards.forEach((card) => {
+  console.log(card);
+});</code></pre>
+        <div class="note">
+          <p>Когда элемент не найден, <code>querySelector</code> возвращает <code>null</code>. Ошибка <em>Cannot read properties of null</em> почти всегда означает опечатку в селекторе.</p>
+        </div>
+      </section>
+
+      <section id="change">
+        <h2>Изменение элементов</h2>
+        <p>У найденного элемента можно поменять текст, классы, атрибуты и стили. Текст лежит в свойстве <code>textContent</code>, классами управляет <code>classList</code>.</p>
+<pre><code class="js">const title = document.querySelector('h1');
+
+title.textContent = 'Новый заголовок';   // текст
+
+title.classList.add('is-active');        // добавить класс
+title.classList.remove('is-active');     // убрать
+title.classList.toggle('is-active');     // переключить
+
+title.style.color = 'tomato';            // стиль напрямую
+
+const link = document.querySelector('a');
+link.setAttribute('href', '/about');     // атрибут</code></pre>
+        <p>Блок ниже найден через <code>querySelector</code>. Кнопки меняют его текст и класс.</p>
+        <div class="demo" data-demo="classes">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <button class="btn btn--primary btn--sm" type="button" data-role="text">Поменять textContent</button>
+            <button class="btn btn--ghost btn--sm" type="button" data-role="toggle">classList.toggle('is-active')</button>
+          </div>
+          <div class="demo-box" aria-live="polite">Я обычный блок</div>
+        </div>
+        <div class="note">
+          <p>Внешний вид удобнее менять классами. Стили описываешь в CSS, а JavaScript только добавляет или убирает класс.</p>
+        </div>
+      </section>
+
+      <section id="events">
+        <h2>События</h2>
+        <p>Клик, нажатие клавиши, отправка формы: всё, что делает пользователь, браузер называет событиями. Команда <code>addEventListener</code> просит браузер следить за элементом. Ты говоришь ей, какое событие ждать и какую функцию запустить, когда оно случится.</p>
+        <p>В функцию браузер передаёт объект события с подробностями. Через <code>event.target</code> можно узнать, на каком именно элементе всё произошло.</p>
+<pre><code class="js">const button = document.querySelector('button');
+
+button.addEventListener('click', () => {
+  console.log('По кнопке кликнули!');
+});
+
+// Объект события — подробности о том, что произошло
+const input = document.querySelector('input');
+
+input.addEventListener('input', (event) => {
+  console.log(event.target.value); // текущий текст в поле
+});</code></pre>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Событие</th><th>Когда срабатывает</th></tr></thead>
+            <tbody>
+              <tr><td><code>click</code></td><td>По элементу кликнули</td></tr>
+              <tr><td><code>input</code></td><td>Пользователь изменил текст в поле</td></tr>
+              <tr><td><code>submit</code></td><td>Форму отправили</td></tr>
+              <tr><td><code>keydown</code></td><td>Нажали клавишу</td></tr>
+              <tr><td><code>scroll</code></td><td>Страницу прокрутили</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Кнопка «Нравится»</h3>
+          <p>Лайк под постом устроен просто. Клик увеличивает число в переменной, новое число записывается в кнопку, а класс <code>is-liked</code> перекрашивает её.</p>
+<pre><code class="js">const button = document.querySelector('.like-btn');
+const count = document.querySelector('.like-count');
+let likes = 0;
+
+button.addEventListener('click', () => {
+  likes++;
+  count.textContent = likes;
+  button.classList.add('is-liked');
+});</code></pre>
+          <div class="demo" data-demo="like">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <button class="btn btn--ghost btn--sm like-btn" type="button">♥ Нравится · <span data-role="count">0</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="create">
+        <h2>Создание элементов</h2>
+        <p>Новый элемент появляется на странице в три шага. Сначала ты создаёшь его, потом наполняешь текстом, потом вставляешь в нужное место. Пока третий шаг не сделан, элемент существует только в памяти и на странице его не видно.</p>
+<pre><code class="js">const list = document.querySelector('ul');
+
+const item = document.createElement('li'); // 1. создать
+item.textContent = 'Купить молоко';        // 2. наполнить
+list.appendChild(item);                    // 3. вставить
+
+item.remove(); // удалить со страницы</code></pre>
+        <div class="note note--danger">
+          <p>Текст, который ввёл пользователь, вставляй только через <code>textContent</code>. Если использовать <code>innerHTML</code>, злоумышленник сможет написать в поле вредный код, и он выполнится у других посетителей. Такая атака называется XSS.</p>
+        </div>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Список дел</h3>
+          <p>Форма добавляет задачу в список, а клик по задаче её удаляет. Обрати внимание на <code>event.preventDefault()</code>. Без этой строки браузер после отправки формы перезагрузит страницу, и список пропадёт.</p>
+<pre><code class="js">const form = document.querySelector('form');
+const input = document.querySelector('input');
+const list = document.querySelector('ul');
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // не перезагружать страницу
+
+  const text = input.value.trim();
+  if (!text) return; // пустую задачу не добавляем
+
+  const item = document.createElement('li');
+  item.textContent = text;
+  list.appendChild(item);
+  input.value = '';
+});
+
+// Клик по задаче — удалить её
+list.addEventListener('click', (event) => {
+  if (event.target.tagName === 'LI') {
+    event.target.remove();
+  }
+});</code></pre>
+          <div class="demo demo--todo" data-demo="todo">
+            <p class="demo__title">Живой пример</p>
+            <form class="demo__row">
+              <input class="input" type="text" placeholder="Что нужно сделать?" maxlength="60" aria-label="Новая задача">
+              <button class="btn btn--primary btn--sm" type="submit">Добавить</button>
+            </form>
+            <ul>
+              <li title="Нажми, чтобы удалить">Выучить querySelector</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="data.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>Массивы и объекты</a>
+        <a class="pager__next" href="async.html"><span>Дальше <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>Асинхронность</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's JS</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/demos.js"></script>
+</body>
+</html>

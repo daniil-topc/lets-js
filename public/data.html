@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Массивы и объекты — let's JS</title>
+  <meta name="description" content="Массивы и объекты в JavaScript: методы map, filter, reduce, деструктуризация и JSON с примерами.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <script src="js/theme-init.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's JS — на главную"><span class="logo__kw">let</span>'s <span class="logo__js">JS</span></a>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="basics.html">Основы</a>
+        <a href="control.html">Условия и циклы</a>
+        <a href="functions.html">Функции</a>
+        <a href="data.html">Массивы и объекты</a>
+        <a href="dom.html">DOM</a>
+        <a href="async.html">Асинхронность</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-3"/><path d="M8 21H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h3"/></svg></span>
+        <p class="eyebrow">Глава 04</p>
+      </div>
+      <h1>Массивы и объекты</h1>
+      <p class="lead">Данные редко приходят по одному. В магазине сотни товаров, и у каждого есть название, цена, фото. Для списков в JavaScript есть массивы, для описания одной вещи есть объекты.</p>
+
+      <section id="arrays">
+        <h2>Массивы</h2>
+        <p>Массив хранит значения по порядку, как список покупок. У каждого элемента есть номер, и тут первая ловушка для новичка: счёт идёт с нуля. Первый элемент имеет номер 0, второй номер 1.</p>
+<pre><code class="js">const fruits = ['яблоко', 'банан', 'киви'];
+
+fruits[0];        // 'яблоко' — первый элемент
+fruits[2];        // 'киви'
+fruits.length;    // 3 — сколько элементов
+
+fruits.push('манго');     // добавить в конец
+fruits.pop();             // убрать последний
+fruits.includes('банан'); // true — есть ли такой
+fruits.indexOf('киви');   // 2 — на каком месте
+fruits.join(', ');        // 'яблоко, банан, киви'</code></pre>
+        <p>Кнопки ниже вызывают <code>push</code> и <code>pop</code> на настоящем массиве.</p>
+        <div class="demo" data-demo="array">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <button class="btn btn--primary btn--sm" type="button" data-role="push">fruits.push()</button>
+            <button class="btn btn--ghost btn--sm" type="button" data-role="pop">fruits.pop()</button>
+          </div>
+          <p class="demo__out" aria-live="polite"><code data-role="value"></code></p>
+          <p class="demo__out">fruits.length: <strong data-role="length"></strong></p>
+        </div>
+      </section>
+
+      <section id="methods">
+        <h2>map, filter, reduce</h2>
+        <p>Со списками обычно делают три вещи: переделывают каждый элемент, отбирают нужные или считают итог. Для этого у массива есть методы <code>map</code>, <code>filter</code> и <code>reduce</code>. Каждому ты передаёшь функцию, и он применяет её ко всем элементам по очереди.</p>
+        <p>Исходный массив при этом остаётся как был. Методы возвращают новый результат.</p>
+<pre><code class="js">const prices = [100, 250, 400];
+
+// map — превратить каждый элемент во что-то другое
+const withTax = prices.map((price) => price * 1.2);
+// [120, 300, 480]
+
+// filter — оставить только подходящие
+const cheap = prices.filter((price) => price &lt; 300);
+// [100, 250]
+
+// reduce — свернуть весь массив в одно значение
+const total = prices.reduce((sum, price) => sum + price, 0);
+// 750
+
+// find — найти первый подходящий
+const first = prices.find((price) => price > 200);
+// 250</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Фильтр товаров по цене</h3>
+          <p>Ползунок «цена до» есть в любом каталоге. Когда ты его двигаешь, <code>filter</code> отбирает товары дешевле выбранной цены, а <code>reduce</code> складывает их стоимость.</p>
+<pre><code class="js">const products = [
+  { title: 'Чехол для телефона', price: 890 },
+  { title: 'Беспроводная мышь', price: 1990 },
+  { title: 'Наушники', price: 7900 },
+];
+
+function getAffordable(maxPrice) {
+  return products.filter((product) => product.price &lt;= maxPrice);
+}
+
+const list = getAffordable(2000); // чехол и мышь
+const total = list.reduce((sum, product) => sum + product.price, 0); // 2880</code></pre>
+          <div class="demo" data-demo="filter">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <label for="priceRange">Цена до: <strong data-role="max"></strong></label>
+              <input id="priceRange" type="range" min="500" max="16000" step="100" value="5000">
+            </div>
+            <ul></ul>
+            <p class="demo__out" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="objects">
+        <h2>Объекты</h2>
+        <p>Объект описывает одну вещь со всеми её свойствами. Похоже на анкету: слева название поля, справа ответ. Имя: Аня, возраст: 21. Название поля программисты называют ключом, а ответ значением. Чтобы прочитать значение, напиши имя объекта, точку и ключ.</p>
+<pre><code class="js">const user = {
+  name: 'Аня',
+  age: 21,
+  isAdmin: false,
+  greet() {
+    return `Привет, я ${this.name}`;
+  },
+};
+
+user.name;        // 'Аня'
+user.age = 22;    // изменить свойство
+user.city = 'Минск'; // добавить новое
+user.greet();     // 'Привет, я Аня'
+
+Object.keys(user); // ['name', 'age', 'isAdmin', 'greet', 'city']</code></pre>
+        <p>Заполни анкету и посмотри, как выглядит объект.</p>
+        <div class="demo" data-demo="object">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <input class="input" data-role="name" type="text" value="Аня" maxlength="20" aria-label="Имя">
+            <input class="input input--sm" data-role="age" type="number" value="21" min="0" max="150" aria-label="Возраст">
+          </div>
+          <p class="demo__out" aria-live="polite"><code data-role="object"></code></p>
+          <p class="demo__out"><code>user.name</code> вернёт <strong data-role="read"></strong></p>
+        </div>
+        <div class="note">
+          <p><code>const</code> запрещает положить в переменную другой объект. Менять свойства внутри объекта при этом можно.</p>
+        </div>
+      </section>
+
+      <section id="destructuring">
+        <h2>Деструктуризация и spread</h2>
+        <p>Писать <code>user.name</code>, <code>user.age</code>, <code>user.city</code> по десять раз утомительно. Деструктуризация достаёт нужные значения из объекта или массива в отдельные переменные за одну строку.</p>
+        <p>Три точки (<code>...</code>) называются spread. Они «высыпают» содержимое объекта или массива в новый, и так удобно делать копию с небольшими изменениями.</p>
+<pre><code class="js">const user = { name: 'Аня', age: 21, city: 'Минск' };
+
+// Деструктуризация — вместо user.name, user.age
+const { name, age } = user;
+
+const [first, second] = ['яблоко', 'банан'];
+// first → 'яблоко', second → 'банан'
+
+// Spread (...) — копия с изменениями
+const older = { ...user, age: 22 };
+const more = [...['a', 'b'], 'c']; // ['a', 'b', 'c']</code></pre>
+      </section>
+
+      <section id="json">
+        <h2>JSON</h2>
+        <p>Объект живёт в памяти программы, и отправить его на сервер или сохранить в браузере напрямую нельзя. Сначала его превращают в текст. Формат этого текста называется JSON, и выглядит он почти как обычный объект JavaScript. <code>JSON.stringify</code> делает из объекта строку, <code>JSON.parse</code> превращает строку обратно в объект.</p>
+<pre><code class="js">const settings = { theme: 'dark', fontSize: 16 };
+
+// Объект → строка
+const text = JSON.stringify(settings);
+// '{"theme":"dark","fontSize":16}'
+
+// Строка → объект
+const data = JSON.parse(text);
+data.theme; // 'dark'</code></pre>
+        <p>Поменяй настройки и посмотри, какая строка получится.</p>
+        <div class="demo" data-demo="json">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <select class="input" data-role="theme" aria-label="Тема">
+              <option value="dark">theme: 'dark'</option>
+              <option value="light">theme: 'light'</option>
+            </select>
+            <label for="fontRange">fontSize:</label>
+            <input id="fontRange" data-role="size" type="range" min="12" max="24" value="16">
+          </div>
+          <p class="demo__out" aria-live="polite"><code data-role="json"></code></p>
+        </div>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Запомнить тему сайта</h3>
+          <p>Кнопка темы в шапке этого сайта запоминает твой выбор в <code>localStorage</code>. Это хранилище внутри браузера, и данные в нём остаются после перезагрузки страницы. Переключи тему, обнови страницу и убедись сам.</p>
+<pre><code class="js">const button = document.querySelector('#themeToggle');
+
+button.addEventListener('click', () => {
+  const current = document.documentElement.dataset.theme;
+  const next = current === 'dark' ? 'light' : 'dark';
+
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next); // сохранили
+});
+
+// При загрузке страницы — достаём сохранённое
+const saved = localStorage.getItem('theme'); // 'dark' или null</code></pre>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="functions.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>Функции</a>
+        <a class="pager__next" href="dom.html"><span>Дальше <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>DOM и события</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's JS</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/demos.js"></script>
+</body>
+</html>

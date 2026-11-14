@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Условия и циклы — let's JS</title>
+  <meta name="description" content="Условия if / else, тернарный оператор, switch и циклы for, while, for...of в JavaScript с примерами.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <script src="js/theme-init.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's JS — на главную"><span class="logo__kw">let</span>'s <span class="logo__js">JS</span></a>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="basics.html">Основы</a>
+        <a href="control.html">Условия и циклы</a>
+        <a href="functions.html">Функции</a>
+        <a href="data.html">Массивы и объекты</a>
+        <a href="dom.html">DOM</a>
+        <a href="async.html">Асинхронность</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></span>
+        <p class="eyebrow">Глава 02</p>
+      </div>
+      <h1>Условия и циклы</h1>
+      <p class="lead">Программа часто должна выбирать: пустить пользователя или нет, показать скидку или обычную цену. За выбор отвечают условия. А когда одно действие нужно повторить много раз, помогают циклы.</p>
+
+      <section id="if">
+        <h2>if / else</h2>
+        <p>Ты пользуешься условиями каждый день: если на улице дождь, беру зонт, иначе иду так. В коде то же самое. В круглых скобках стоит вопрос, на который можно ответить «да» или «нет». Если ответ «да», выполняется код в первых фигурных скобках. Если «нет», JavaScript переходит к <code>else</code>.</p>
+<pre><code class="js">const age = 17;
+
+if (age >= 18) {
+  console.log('Доступ открыт');
+} else if (age >= 16) {
+  console.log('Доступ с согласия родителей');
+} else {
+  console.log('Доступ закрыт');
+}
+// Выведет: Доступ с согласия родителей</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Проверка пароля при регистрации</h3>
+          <p>Форма регистрации подсказывает, что не так с паролем, прямо во время ввода. Внутри у неё цепочка проверок: сначала длина, потом наличие цифры. Сработает первая проверка, которая найдёт проблему.</p>
+<pre><code class="js">function checkPassword(value) {
+  if (value.length &lt; 8) {
+    return 'Слишком короткий';
+  } else if (!/\d/.test(value)) {
+    return 'Добавь хотя бы одну цифру';
+  } else {
+    return 'Отличный пароль!';
+  }
+}</code></pre>
+          <div class="demo" data-demo="password">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <input class="input" type="text" placeholder="Придумай пароль" maxlength="40" autocomplete="off" aria-label="Пароль">
+            </div>
+            <p class="demo__out" aria-live="polite">Начни вводить пароль</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="ternary">
+        <h2>Тернарный оператор</h2>
+        <p>Иногда условие нужно только для того, чтобы выбрать одно из двух значений. Для этого есть короткая запись в одну строку: <code>условие ? если да : если нет</code>. Читай её как вопрос: «Товар есть? Тогда пиши „В наличии“, иначе „Нет в наличии“».</p>
+<pre><code class="js">const count = 3;
+
+// Длинно
+let label;
+if (count > 0) {
+  label = 'В наличии';
+} else {
+  label = 'Нет в наличии';
+}
+
+// Коротко — то же самое
+const status = count > 0 ? 'В наличии' : 'Нет в наличии';</code></pre>
+        <p>Поменяй количество товара на складе и посмотри, какую надпись выберет тернарный оператор.</p>
+        <div class="demo" data-demo="stock">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <label for="stockCount">Товара на складе:</label>
+            <input class="input input--sm" id="stockCount" type="number" value="3" min="0" max="999">
+          </div>
+          <p class="demo__out" aria-live="polite"></p>
+        </div>
+        <div class="note">
+          <p>Тернарный оператор внутри другого тернарного читать очень трудно. Если вариантов больше двух, бери <code>if</code> или <code>switch</code>.</p>
+        </div>
+      </section>
+
+      <section id="switch">
+        <h2>switch</h2>
+        <p>Бывает, что одно значение нужно сравнить с целым списком вариантов. Статус заказа, например, может быть «новый», «в пути» или «доставлен», и для каждого нужен свой текст. Длинная цепочка <code>else if</code> тут превращается в кашу, а <code>switch</code> раскладывает варианты по полочкам.</p>
+<pre><code class="js">const status = 'shipped';
+let text;
+
+switch (status) {
+  case 'new':
+    text = 'Заказ принят';
+    break;
+  case 'shipped':
+    text = 'Заказ в пути';
+    break;
+  case 'done':
+    text = 'Заказ доставлен';
+    break;
+  default:
+    text = 'Статус неизвестен';
+}
+// text → 'Заказ в пути'</code></pre>
+        <div class="demo" data-demo="order">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <label for="orderStatus">status =</label>
+            <select class="input" id="orderStatus">
+              <option value="new">'new'</option>
+              <option value="shipped" selected>'shipped'</option>
+              <option value="done">'done'</option>
+              <option value="lost">'lost'</option>
+            </select>
+          </div>
+          <p class="demo__out" aria-live="polite"></p>
+        </div>
+        <div class="note note--danger">
+          <p>После каждого варианта ставь <code>break</code>. Без него JavaScript не остановится и выполнит код следующего варианта тоже.</p>
+        </div>
+      </section>
+
+      <section id="for">
+        <h2>Цикл for</h2>
+        <p>Цикл повторяет код столько раз, сколько скажешь. В скобках у <code>for</code> три части через точку с запятой. Первая создаёт счётчик, вторая проверяет, продолжать ли, третья меняет счётчик после каждого круга.</p>
+        <p>Запись <code>i++</code> означает «увеличь i на единицу».</p>
+<pre><code class="js">//   начало     условие   шаг
+for (let i = 1; i &lt;= 5; i++) {
+  console.log(`Шаг ${i}`);
+}
+// Шаг 1, Шаг 2, Шаг 3, Шаг 4, Шаг 5</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Рейтинг звёздами</h3>
+          <p>Оценка товара в интернет-магазине рисуется циклом. Он идёт от 1 до 5 и на каждом шаге спрашивает: этот номер меньше оценки или равен ей? Если да, ставит закрашенную звезду, иначе пустую.</p>
+<pre><code class="js">function renderStars(rating) {
+  let stars = '';
+  for (let i = 1; i &lt;= 5; i++) {
+    stars += i &lt;= rating ? '★' : '☆';
+  }
+  return stars;
+}
+
+renderStars(3); // '★★★☆☆'</code></pre>
+          <div class="demo" data-demo="stars">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <label for="starsRange">Оценка:</label>
+              <input id="starsRange" type="range" min="0" max="5" value="3">
+            </div>
+            <p class="demo__out" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="while">
+        <h2>while и for...of</h2>
+        <p>Цикл <code>while</code> подходит, когда число повторов заранее неизвестно. Он крутится, пока условие в скобках верно. Так работают попытки ввода пин-кода: пока попытки остались, спрашиваем ещё раз.</p>
+        <p>А <code>for...of</code> перебирает массив: берёт элементы по одному, от первого до последнего, и для каждого выполняет код.</p>
+<pre><code class="js">// while — пока есть попытки
+let attempts = 3;
+while (attempts > 0) {
+  console.log(`Осталось попыток: ${attempts}`);
+  attempts--;
+}
+
+// for...of — каждый элемент по очереди
+const fruits = ['яблоко', 'банан', 'киви'];
+for (const fruit of fruits) {
+  console.log(fruit);
+}</code></pre>
+        <div class="note note--danger">
+          <p>Если условие в <code>while</code> никогда не станет ложным, цикл не остановится и вкладка зависнет. Проверь, что внутри цикла меняется то, что стоит в условии.</p>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="basics.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>Основы</a>
+        <a class="pager__next" href="functions.html"><span>Дальше <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>Функции</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's JS</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/demos.js"></script>
+</body>
+</html>
