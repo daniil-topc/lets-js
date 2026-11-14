@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Данные и свои хуки — let's React</title>
+  <meta name="description" content="Загрузка данных в React, собственные хуки и контекст на реальных примерах.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <script src="../js/theme-init.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's React, на главную">let's</a>
+      <nav class="switch" aria-label="Справочники">
+        <a href="../index.html">JS</a>
+        <a href="index.html" aria-current="true">React</a>
+      </nav>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="components.html">Компоненты</a>
+        <a href="props.html">Пропсы</a>
+        <a href="state.html">Состояние</a>
+        <a href="render.html">Условия и списки</a>
+        <a href="effects.html">Эффекты</a>
+        <a href="data.html">Данные и хуки</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg></span>
+        <p class="eyebrow">Глава 06</p>
+      </div>
+      <h1>Данные и свои хуки</h1>
+      <p class="lead">В последней главе компонент получает данные с сервера, а повторяющаяся логика переезжает в собственный хук.</p>
+
+      <section id="fetching">
+        <h2>Загрузка данных</h2>
+        <p>Почти каждое приложение получает данные с сервера. Запрос это эффект, поэтому он живёт в <code>useEffect</code>. Сам <code>fetch</code> и <code>async / await</code> разобраны в <a href="../async.html">главе про асинхронность</a>.</p>
+        <p>У запроса три исхода, и для каждого нужно своё состояние: данные ещё грузятся, данные пришли, случилась ошибка. Если забыть про первый и третий, человек увидит пустой экран и не поймёт, что происходит.</p>
+<pre><code class="js jsx">function Tip() {
+  const [tip, setTip] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() =&gt; {
+    async function load() {
+      try {
+        const response = await fetch('/api/tip');
+        if (!response.ok) throw new Error(response.status);
+        setTip(await response.json());
+      } catch (err) {
+        setError('Не удалось загрузить совет');
+      }
+    }
+
+    load();
+  }, []);
+
+  if (error) return &lt;p&gt;{error}&lt;/p&gt;;
+  if (!tip) return &lt;p&gt;Загрузка…&lt;/p&gt;;
+
+  return &lt;p&gt;{tip.text}&lt;/p&gt;;
+}</code></pre>
+        <div class="demo" data-demo="tip">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <button class="btn btn--primary btn--sm" type="button">Загрузить совет</button>
+          </div>
+          <p class="demo__out" aria-live="polite">Нажми кнопку, и совет придёт с сервера</p>
+          <p class="demo__out">Состояние: <code data-role="state">tip = null, error = null</code></p>
+        </div>
+        <div class="note">
+          <p>В больших проектах запросы обычно отдают готовым библиотекам вроде TanStack Query. Они сами кэшируют ответы и повторяют неудачные запросы. Но устроены они на тех же хуках, поэтому сначала стоит понять ручной способ.</p>
+        </div>
+      </section>
+
+      <section id="custom-hooks">
+        <h2>Свои хуки</h2>
+        <p>Когда одна и та же связка из состояния и эффекта нужна в нескольких компонентах, её выносят в отдельную функцию. Если имя функции начинается с <code>use</code> и внутри она вызывает другие хуки, это твой собственный хук. Компоненты пользуются им так же, как встроенными.</p>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Форма, которая помнит введённое</h3>
+          <p>Человек начал заполнять анкету и случайно закрыл вкладку. Обидно вводить всё заново. Хук <code>useLocalStorage</code> работает как <code>useState</code>, только каждое значение сохраняет в хранилище браузера и при следующем открытии берёт его оттуда.</p>
+<pre><code class="js jsx">function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() =&gt; {
+    const saved = localStorage.getItem(key);
+    return saved !== null ? JSON.parse(saved) : initialValue;
+  });
+
+  useEffect(() =&gt; {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+
+function Profile() {
+  const [name, setName] = useLocalStorage('name', '');
+
+  return &lt;input value={name} onChange={(e) =&gt; setName(e.target.value)} /&gt;;
+}</code></pre>
+          <div class="demo" data-demo="remember">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <input class="input" type="text" placeholder="Твоё имя" maxlength="20" aria-label="Имя">
+            </div>
+            <p class="demo__out" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="context">
+        <h2>Контекст</h2>
+        <p>Некоторые данные нужны сразу многим компонентам: тема оформления, язык, текущий пользователь. Передавать их пропсами через пять уровней вложенности неудобно. Контекст работает как радио: один компонент вещает значение, а любой компонент ниже по дереву может на него настроиться.</p>
+<pre><code class="js jsx">import { createContext, useContext, useState } from 'react';
+
+const ThemeContext = createContext('light');
+
+function App() {
+  const [theme, setTheme] = useState('dark');
+
+  return (
+    &lt;ThemeContext.Provider value={theme}&gt;
+      &lt;Page /&gt;
+    &lt;/ThemeContext.Provider&gt;
+  );
+}
+
+// Компонент на любой глубине получает значение напрямую
+function Header() {
+  const theme = useContext(ThemeContext);
+
+  return &lt;header className={`header header--${theme}`}&gt;let's React&lt;/header&gt;;
+}</code></pre>
+        <div class="note">
+          <p>Контекст подходит для данных, которые меняются редко. Для всего остального хватает пропсов и состояния, и код с ними проще читать.</p>
+        </div>
+      </section>
+
+      <section id="next">
+        <h2>Что дальше</h2>
+        <p>Теперь ты знаешь основу, на которой держится любое React-приложение. Дальше стоит собрать что-нибудь своё: список дел, каталог с фильтром, погоду по городу. На практике быстро всплывут три темы, которые в этот справочник не вошли.</p>
+        <ul>
+          <li>Маршрутизация, чтобы у приложения было несколько страниц. Самая известная библиотека называется React Router.</li>
+          <li>Хук <code>useReducer</code> для состояния со сложной логикой.</li>
+          <li>Официальная документация на <a href="https://react.dev/learn" rel="noopener noreferrer">react.dev</a>, там есть учебник с задачами.</li>
+        </ul>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="effects.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>Эффекты</a>
+        <a class="pager__next" href="index.html"><span>Готово <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>На главную</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's React</span>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/react-demos.js"></script>
+</body>
+</html>

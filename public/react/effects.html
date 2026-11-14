@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Эффекты — let's React</title>
+  <meta name="description" content="Хуки useEffect и useRef в React: массив зависимостей, очистка эффекта и доступ к элементам страницы.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <script src="../js/theme-init.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's React, на главную">let's</a>
+      <nav class="switch" aria-label="Справочники">
+        <a href="../index.html">JS</a>
+        <a href="index.html" aria-current="true">React</a>
+      </nav>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="components.html">Компоненты</a>
+        <a href="props.html">Пропсы</a>
+        <a href="state.html">Состояние</a>
+        <a href="render.html">Условия и списки</a>
+        <a href="effects.html">Эффекты</a>
+        <a href="data.html">Данные и хуки</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span>
+        <p class="eyebrow">Глава 05</p>
+      </div>
+      <h1>Эффекты</h1>
+      <p class="lead">Таймеры, заголовок вкладки и подписки находятся за пределами React. Эффекты связывают компонент с этим внешним миром.</p>
+
+      <section id="useeffect">
+        <h2>useEffect</h2>
+        <p>Компонент должен только считать разметку из пропсов и состояния. Но иногда нужно выйти за пределы React: запустить таймер, поменять заголовок вкладки, подписаться на событие окна, сходить на сервер. Такие действия называют эффектами, и для них есть хук <code>useEffect</code>.</p>
+        <p>Он принимает функцию и запускает её после того, как компонент появился на экране.</p>
+<pre><code class="js jsx">import { useEffect, useState } from 'react';
+
+function Cart() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() =&gt; {
+    document.title = `В корзине: ${count}`;
+  }, [count]);
+
+  return &lt;button onClick={() =&gt; setCount(count + 1)}&gt;Добавить&lt;/button&gt;;
+}</code></pre>
+      </section>
+
+      <section id="deps">
+        <h2>Массив зависимостей</h2>
+        <p>Второй аргумент <code>useEffect</code> говорит, когда запускать эффект заново. Это массив значений, за которыми эффект следит. React сравнивает их с прошлым разом и запускает эффект, только если что-то изменилось.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Запись</th><th>Когда запускается</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>useEffect(fn, [])</code></td><td>Один раз, когда компонент появился</td></tr>
+              <tr><td><code>useEffect(fn, [count])</code></td><td>При появлении и после каждого изменения <code>count</code></td></tr>
+              <tr><td><code>useEffect(fn)</code></td><td>После каждой перерисовки, нужно редко</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note note--danger">
+          <p>Перечисляй в массиве все пропсы и состояния, которые эффект читает. Если что-то пропустить, эффект будет работать со старым значением, и такую ошибку трудно заметить.</p>
+        </div>
+      </section>
+
+      <section id="cleanup">
+        <h2>Очистка</h2>
+        <p>Таймер, запущенный в эффекте, продолжит тикать, даже когда компонент уже исчез со страницы. Чтобы этого не случилось, верни из эффекта функцию. React вызовет её, когда компонент убирают или перед следующим запуском эффекта. Правило простое: что эффект включил, то очистка выключает.</p>
+<pre><code class="js jsx">useEffect(() =&gt; {
+  const timerId = setInterval(() =&gt; {
+    console.log('тик');
+  }, 1000);
+
+  return () =&gt; clearInterval(timerId);   // очистка
+}, []);</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Секундомер на тренировке</h3>
+          <p>Пока секундомер включён, число растёт каждую секунду. Эффект следит за флагом <code>running</code>: когда он становится истинным, запускается интервал. Когда флаг выключают или компонент убирают, очистка останавливает интервал.</p>
+<pre><code class="js jsx">function Stopwatch() {
+  const [seconds, setSeconds] = useState(0);
+  const [running, setRunning] = useState(false);
+
+  useEffect(() =&gt; {
+    if (!running) return;
+
+    const timerId = setInterval(() =&gt; {
+      setSeconds((prev) =&gt; prev + 1);
+    }, 1000);
+
+    return () =&gt; clearInterval(timerId);
+  }, [running]);
+
+  return (
+    &lt;&gt;
+      &lt;p&gt;{seconds} с&lt;/p&gt;
+      &lt;button onClick={() =&gt; setRunning(!running)}&gt;
+        {running ? 'Пауза' : 'Старт'}
+      &lt;/button&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+          <div class="demo" data-demo="stopwatch">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <button class="btn btn--primary btn--sm" type="button" data-role="toggle">Старт</button>
+              <button class="btn btn--ghost btn--sm" type="button" data-role="reset">Сбросить</button>
+            </div>
+            <div class="demo-box"><strong data-role="value">0</strong> с</div>
+            <p class="demo__out" aria-live="polite">Интервал не запущен</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="useref">
+        <h2>useRef</h2>
+        <p>Иногда нужен прямой доступ к элементу страницы: поставить курсор в поле, прокрутить к блоку, измерить ширину. Хук <code>useRef</code> создаёт коробку, в которую React положит ссылку на элемент. Сам элемент лежит в свойстве <code>current</code>.</p>
+        <p>Изменение этой коробки не вызывает перерисовку, в этом её отличие от состояния.</p>
+<pre><code class="js jsx">import { useRef } from 'react';
+
+function Search() {
+  const inputRef = useRef(null);
+
+  return (
+    &lt;&gt;
+      &lt;input ref={inputRef} placeholder="Поиск" /&gt;
+      &lt;button onClick={() =&gt; inputRef.current.focus()}&gt;
+        Найти
+      &lt;/button&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+        <div class="demo" data-demo="focus">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <input class="input" type="text" placeholder="Поиск" aria-label="Поиск">
+            <button class="btn btn--primary btn--sm" type="button">Поставить курсор в поле</button>
+          </div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="render.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>Условия и списки</a>
+        <a class="pager__next" href="data.html"><span>Дальше <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>Данные и свои хуки</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's React</span>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/react-demos.js"></script>
+</body>
+</html>

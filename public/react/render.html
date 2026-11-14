@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Условия и списки — let's React</title>
+  <meta name="description" content="Условный рендеринг и списки в React: операторы && и ?:, метод map и пропс key.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <script src="../js/theme-init.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's React, на главную">let's</a>
+      <nav class="switch" aria-label="Справочники">
+        <a href="../index.html">JS</a>
+        <a href="index.html" aria-current="true">React</a>
+      </nav>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="components.html">Компоненты</a>
+        <a href="props.html">Пропсы</a>
+        <a href="state.html">Состояние</a>
+        <a href="render.html">Условия и списки</a>
+        <a href="effects.html">Эффекты</a>
+        <a href="data.html">Данные и хуки</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg></span>
+        <p class="eyebrow">Глава 04</p>
+      </div>
+      <h1>Условия и списки</h1>
+      <p class="lead">Интерфейс редко бывает неизменным. Одни блоки появляются по условию, другие повторяются столько раз, сколько элементов пришло в данных.</p>
+
+      <section id="conditions">
+        <h2>Условный рендеринг</h2>
+        <p>Часть интерфейса часто нужно показывать только при каком-то условии: сообщение об ошибке, значок «Нет в наличии», меню для вошедшего пользователя. Внутри JSX нельзя написать <code>if</code>, зато работают два оператора из JavaScript.</p>
+        <p>Оператор <code>&amp;&amp;</code> показывает элемент, когда условие истинно. Тернарный оператор выбирает один вариант из двух.</p>
+<pre><code class="js jsx">function Product({ inStock, discount }) {
+  return (
+    &lt;div&gt;
+      {discount &gt; 0 &amp;&amp; &lt;span className="badge"&gt;Скидка {discount}%&lt;/span&gt;}
+
+      {inStock ? &lt;button&gt;В корзину&lt;/button&gt; : &lt;p&gt;Нет в наличии&lt;/p&gt;}
+    &lt;/div&gt;
+  );
+}</code></pre>
+        <p>Когда вариантов больше двух или внутри много разметки, обычный <code>if</code> перед <code>return</code> читается легче.</p>
+<pre><code class="js jsx">function Status({ state }) {
+  if (state === 'loading') return &lt;p&gt;Загрузка…&lt;/p&gt;;
+  if (state === 'error') return &lt;p&gt;Что-то пошло не так&lt;/p&gt;;
+
+  return &lt;p&gt;Готово&lt;/p&gt;;
+}</code></pre>
+        <div class="demo" data-demo="toggle">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <button class="btn btn--ghost btn--sm" type="button" aria-expanded="false">Показать состав</button>
+          </div>
+          <div class="demo-box" hidden>Состав: хлопок 95%, эластан 5%. Стирать при 30 градусах.</div>
+          <p class="demo__out">isOpen = <code data-role="state">false</code></p>
+        </div>
+        <div class="note note--danger">
+          <p>С числами и <code>&amp;&amp;</code> есть ловушка. Запись <code>{count &amp;&amp; &lt;Badge /&gt;}</code> при нуле выведет на страницу цифру 0. Пиши условие полностью: <code>{count &gt; 0 &amp;&amp; &lt;Badge /&gt;}</code>.</p>
+        </div>
+      </section>
+
+      <section id="lists">
+        <h2>Списки</h2>
+        <p>Данные обычно приходят массивом, а на странице нужен список элементов. Метод <code>map</code> превращает каждый элемент массива в кусок разметки. Сам метод разобран в <a href="../data.html">главе про массивы</a>.</p>
+<pre><code class="js jsx">function Menu() {
+  const dishes = ['Борщ', 'Плов', 'Сырники'];
+
+  return (
+    &lt;ul&gt;
+      {dishes.map((dish) =&gt; (
+        &lt;li key={dish}&gt;{dish}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+      </section>
+
+      <section id="keys">
+        <h2>Зачем нужен key</h2>
+        <p>Каждому элементу списка нужен пропс <code>key</code> с уникальным значением. Представь гардероб: номерок помогает найти своё пальто, даже если вешалки переставили. По ключу React понимает, какой элемент остался на месте, какой добавили, а какой убрали, и обновляет только нужные.</p>
+        <p>Лучший ключ это <code>id</code> из данных. Индекс элемента в массиве для этой роли подходит плохо: после удаления или сортировки индексы сдвигаются, и React путает элементы между собой.</p>
+<pre><code class="js jsx">const tasks = [
+  { id: 1, text: 'Купить хлеб' },
+  { id: 2, text: 'Выучить useState' },
+];
+
+{tasks.map((task) =&gt; (
+  &lt;li key={task.id}&gt;{task.text}&lt;/li&gt;
+))}</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Список задач с фильтром</h3>
+          <p>Здесь сходится всё из этой и прошлой главы. Задачи лежат в состоянии массивом объектов. Клик по задаче создаёт новый массив, где у неё поменялась отметка. Фильтр хранится отдельно, а видимый список вычисляется из задач и фильтра.</p>
+<pre><code class="js jsx">function TodoList() {
+  const [tasks, setTasks] = useState([
+    { id: 1, text: 'Прочитать про key', done: true },
+    { id: 2, text: 'Написать свой список', done: false },
+  ]);
+  const [onlyActive, setOnlyActive] = useState(false);
+
+  function toggle(id) {
+    setTasks(tasks.map((task) =&gt;
+      task.id === id ? { ...task, done: !task.done } : task
+    ));
+  }
+
+  const visible = onlyActive ? tasks.filter((task) =&gt; !task.done) : tasks;
+
+  return (
+    &lt;&gt;
+      &lt;label&gt;
+        &lt;input
+          type="checkbox"
+          checked={onlyActive}
+          onChange={(e) =&gt; setOnlyActive(e.target.checked)}
+        /&gt;
+        Только невыполненные
+      &lt;/label&gt;
+
+      {visible.length === 0 &amp;&amp; &lt;p&gt;Всё сделано&lt;/p&gt;}
+
+      &lt;ul&gt;
+        {visible.map((task) =&gt; (
+          &lt;li key={task.id} onClick={() =&gt; toggle(task.id)}&gt;
+            {task.done ? '✓' : '○'} {task.text}
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+          <div class="demo demo--tasks" data-demo="todos">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <input class="input" type="text" placeholder="Новая задача" maxlength="40" aria-label="Новая задача">
+              <button class="btn btn--primary btn--sm" type="button" data-role="add">Добавить</button>
+            </div>
+            <div class="demo__row demo__row--gap">
+              <label><input type="checkbox" data-role="filter"> Только невыполненные</label>
+            </div>
+            <ul aria-label="Задачи"></ul>
+            <p class="demo__out" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="state.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>Состояние и события</a>
+        <a class="pager__next" href="effects.html"><span>Дальше <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>Эффекты</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's React</span>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/react-demos.js"></script>
+</body>
+</html>

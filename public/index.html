@@ -12,7 +12,11 @@
 <body>
   <header class="header">
     <div class="container header__inner">
-      <a class="logo" href="index.html" aria-label="let's JS — на главную"><span class="logo__kw">let</span>'s <span class="logo__js">JS</span></a>
+      <a class="logo" href="index.html" aria-label="let's JS, на главную">let's</a>
+      <nav class="switch" aria-label="Справочники">
+        <a href="index.html" aria-current="true">JS</a>
+        <a href="react/index.html">React</a>
+      </nav>
       <nav class="nav" id="nav" aria-label="Главы">
         <a href="basics.html">Основы</a>
         <a href="control.html">Условия и циклы</a>
@@ -142,6 +146,16 @@ console.log(`Твой уровень: ${level}`); // 2</code></pre>
           <h3>Живой пример</h3>
           <p>Код из примера работает прямо на странице — нажми и посмотри результат.</p>
         </div>
+      </div>
+    </section>
+
+    <section class="container section">
+      <div class="next">
+        <div>
+          <h2>Дальше React</h2>
+          <p>Когда JavaScript перестанет пугать, загляни в справочник по React. Он устроен так же: короткие объяснения, реальные кейсы и живые примеры.</p>
+        </div>
+        <a class="btn btn--ghost" href="react/index.html">Открыть let's React <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
       </div>
     </section>
   </main>

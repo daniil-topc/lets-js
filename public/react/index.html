@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>let's React — справочник по React для новичков</title>
+  <meta name="description" content="Понятный справочник по React для новичков: компоненты, пропсы, состояние и хуки с примерами кода и реальными кейсами.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <script src="../js/theme-init.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's React, на главную">let's</a>
+      <nav class="switch" aria-label="Справочники">
+        <a href="../index.html">JS</a>
+        <a href="index.html" aria-current="true">React</a>
+      </nav>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="components.html">Компоненты</a>
+        <a href="props.html">Пропсы</a>
+        <a href="state.html">Состояние</a>
+        <a href="render.html">Условия и списки</a>
+        <a href="effects.html">Эффекты</a>
+        <a href="data.html">Данные и хуки</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container hero">
+      <div>
+        <span class="badge">Для тех, кто уже знает основы JavaScript</span>
+        <h1>React простыми словами</h1>
+        <p class="hero__lead">Компоненты, пропсы, состояние и хуки. Короткие объяснения, код и примеры из настоящих интерфейсов, которые можно потрогать прямо на странице.</p>
+        <div class="hero__buttons">
+          <a class="btn btn--primary" href="components.html">Начать с компонентов <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a class="btn btn--ghost" href="#chapters">Все главы</a>
+        </div>
+      </div>
+
+      <div class="window" data-demo="hero">
+        <div class="window__bar" aria-hidden="true"><i></i><i></i><i></i><span>Counter.jsx</span></div>
+<pre><code class="js jsx">// Твой первый компонент
+import { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    &lt;button onClick={() =&gt; setCount(count + 1)}&gt;
+      Нажато: {count}
+    &lt;/button&gt;
+  );
+}</code></pre>
+        <div class="window__out window__out--live">
+          <span class="window__label">Результат</span>
+          <div><button class="btn btn--primary btn--sm" type="button">Нажато: 0</button></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="container section" id="chapters">
+      <h2 class="section__title">Шесть глав: от первого компонента до запроса на сервер</h2>
+      <p class="section__sub">Главы идут по порядку, каждая опирается на предыдущую.</p>
+
+      <div class="cards">
+        <a class="card" href="components.html">
+          <div class="card__top">
+            <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8.5 9 12l-3.5 3.5L2 12l3.5-3.5Z"/><path d="m12 2 3.5 3.5L12 9 8.5 5.5 12 2Z"/><path d="M18.5 8.5 22 12l-3.5 3.5L15 12l3.5-3.5Z"/><path d="m12 15 3.5 3.5L12 22l-3.5-3.5L12 15Z"/></svg></span>
+            <span class="card__num">01</span>
+          </div>
+          <h3>Компоненты и JSX</h3>
+          <p>Что такое React, как написать первый компонент и чем JSX отличается от HTML.</p>
+          <ul class="tags"><li>function</li><li>&lt;App /&gt;</li><li>{ }</li><li>className</li></ul>
+        </a>
+        <a class="card" href="props.html">
+          <div class="card__top">
+            <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg></span>
+            <span class="card__num">02</span>
+          </div>
+          <h3>Пропсы</h3>
+          <p>Как настроить компонент снаружи и передать в него данные, разметку и функции.</p>
+          <ul class="tags"><li>props</li><li>children</li><li>onAdd</li></ul>
+        </a>
+        <a class="card" href="state.html">
+          <div class="card__top">
+            <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="12" x="2" y="6" rx="6" ry="6"/><circle cx="8" cy="12" r="2"/></svg></span>
+            <span class="card__num">03</span>
+          </div>
+          <h3>Состояние и события</h3>
+          <p>Как компонент реагирует на клики и запоминает то, что меняется со временем.</p>
+          <ul class="tags"><li>onClick</li><li>useState</li><li>onChange</li></ul>
+        </a>
+        <a class="card" href="render.html">
+          <div class="card__top">
+            <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg></span>
+            <span class="card__num">04</span>
+          </div>
+          <h3>Условия и списки</h3>
+          <p>Как показывать блоки по условию и выводить массив данных списком.</p>
+          <ul class="tags"><li>&amp;&amp;</li><li>? :</li><li>map</li><li>key</li></ul>
+        </a>
+        <a class="card" href="effects.html">
+          <div class="card__top">
+            <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span>
+            <span class="card__num">05</span>
+          </div>
+          <h3>Эффекты</h3>
+          <p>Как запускать таймеры и подписки и вовремя их останавливать.</p>
+          <ul class="tags"><li>useEffect</li><li>[deps]</li><li>useRef</li></ul>
+        </a>
+        <a class="card" href="data.html">
+          <div class="card__top">
+            <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg></span>
+            <span class="card__num">06</span>
+          </div>
+          <h3>Данные и свои хуки</h3>
+          <p>Как загрузить данные с сервера, написать свой хук и раздать значение через контекст.</p>
+          <ul class="tags"><li>fetch</li><li>useLocalStorage</li><li>useContext</li></ul>
+        </a>
+      </div>
+    </section>
+
+    <section class="container section">
+      <h2 class="section__title">Как здесь всё устроено</h2>
+      <p class="section__sub">Каждая тема разбита на три шага.</p>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg></div>
+          <h3>Синтаксис</h3>
+          <p>Как это пишется и что делает, с бытовым сравнением вместо терминов.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></div>
+          <h3>Реальный кейс</h3>
+          <p>Где это встречается в настоящих приложениях: карточка товара, лайк, список задач.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></div>
+          <h3>Живой пример</h3>
+          <p>Рядом с кодом стоит готовый результат. Нажимай и смотри, как он себя ведёт.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section">
+      <div class="next">
+        <div>
+          <h2>Сначала JavaScript</h2>
+          <p>React написан на JavaScript и без него непонятен. Если переменные, функции и массивы пока даются с трудом, начни со справочника по JavaScript.</p>
+        </div>
+        <a class="btn btn--ghost" href="../index.html">Открыть let's JS <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's React</span>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/react-demos.js"></script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Компоненты и JSX — let's React</title>
+  <meta name="description" content="Основы React для новичков: что такое компонент, как писать JSX и чем он отличается от HTML.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <script src="../js/theme-init.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's React, на главную">let's</a>
+      <nav class="switch" aria-label="Справочники">
+        <a href="../index.html">JS</a>
+        <a href="index.html" aria-current="true">React</a>
+      </nav>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="components.html">Компоненты</a>
+        <a href="props.html">Пропсы</a>
+        <a href="state.html">Состояние</a>
+        <a href="render.html">Условия и списки</a>
+        <a href="effects.html">Эффекты</a>
+        <a href="data.html">Данные и хуки</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8.5 9 12l-3.5 3.5L2 12l3.5-3.5Z"/><path d="m12 2 3.5 3.5L12 9 8.5 5.5 12 2Z"/><path d="M18.5 8.5 22 12l-3.5 3.5L15 12l3.5-3.5Z"/><path d="m12 15 3.5 3.5L12 22l-3.5-3.5L12 15Z"/></svg></span>
+        <p class="eyebrow">Глава 01</p>
+      </div>
+      <h1>Компоненты и JSX</h1>
+      <p class="lead">React собирает страницу из компонентов. В этой главе разберёмся, что это такое, как их писать и почему разметка лежит прямо внутри JavaScript.</p>
+
+      <section id="what">
+        <h2>Что такое React</h2>
+        <p>React это библиотека для JavaScript, которая помогает собирать интерфейсы. В обычном JavaScript ты сам находишь элемент на странице и меняешь его. В React ты описываешь, как страница должна выглядеть при текущих данных, и библиотека сама приводит её к этому виду.</p>
+        <p>Сравни два способа показать число кликов. Слева ты командуешь страницей шаг за шагом. Справа описываешь результат.</p>
+<pre><code class="js jsx">// Обычный JavaScript: находим элемент и меняем его руками
+const counter = document.querySelector('#counter');
+counter.textContent = `Кликов: ${clicks}`;
+
+// React: описываем, что должно быть на экране
+&lt;p&gt;Кликов: {clicks}&lt;/p&gt;</code></pre>
+        <div class="note">
+          <p>Перед React стоит разобраться с JavaScript: переменные, функции, массивы и объекты здесь нужны на каждом шагу. Всё это есть в <a href="../index.html">справочнике по JavaScript</a>.</p>
+        </div>
+        <h3>Как запустить проект</h3>
+        <p>Браузер не понимает React-код напрямую, его сначала нужно собрать. Проще всего взять готовый инструмент Vite. Три команды в терминале создают проект и открывают его в браузере.</p>
+<pre><code class="js jsx">npm create vite@latest my-app -- --template react
+cd my-app
+npm install &amp;&amp; npm run dev</code></pre>
+      </section>
+
+      <section id="component">
+        <h2>Компонент</h2>
+        <p>Представь конструктор. Из одинаковых деталей можно собрать и дом, и машину. В React такие детали называются компонентами: кнопка, карточка товара, шапка сайта. Ты описываешь деталь один раз и ставишь её в любое место страницы.</p>
+        <p>Компонент пишется как обычная функция. Она возвращает разметку, которую нужно показать.</p>
+<pre><code class="js jsx">function Welcome() {
+  return &lt;h1&gt;Привет, новичок!&lt;/h1&gt;;
+}
+
+// Используем компонент как свой собственный тег
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;Welcome /&gt;
+      &lt;Welcome /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+        <div class="note note--danger">
+          <p>Имя компонента всегда пиши с большой буквы. По этому признаку React отличает твой <code>&lt;Welcome /&gt;</code> от обычного тега вроде <code>&lt;div&gt;</code>.</p>
+        </div>
+      </section>
+
+      <section id="jsx">
+        <h2>JSX</h2>
+        <p>Разметка внутри функции похожа на HTML, но это JSX: расширение JavaScript, которое позволяет писать теги прямо в коде. Главная его возможность скрыта в фигурных скобках. Всё, что стоит внутри <code>{ }</code>, выполняется как JavaScript, и результат попадает на страницу.</p>
+<pre><code class="js jsx">function Profile() {
+  const name = 'Аня';
+  const tasks = 3;
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Привет, {name}!&lt;/h2&gt;
+      &lt;p&gt;Задач на сегодня: {tasks}&lt;/p&gt;
+      &lt;p&gt;Если сделать две, останется {tasks - 2}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+        <p>В поле ниже лежит значение переменной <code>name</code>. Меняй его и смотри, как меняется результат.</p>
+        <div class="demo" data-demo="card">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <label for="cardName">name =</label>
+            <input class="input" id="cardName" type="text" value="Аня" maxlength="20">
+          </div>
+          <div class="demo-box">
+            <strong data-role="hello"></strong><br>
+            <span data-role="len"></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="rules">
+        <h2>Правила JSX</h2>
+        <p>JSX строже, чем HTML. Запомни четыре отличия, и большинство ошибок новичка тебя обойдёт.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Правило</th><th>В HTML</th><th>В JSX</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Класс пишется иначе</td><td><code>class="card"</code></td><td><code>className="card"</code></td></tr>
+              <tr><td>Каждый тег закрыт</td><td><code>&lt;img&gt;</code></td><td><code>&lt;img /&gt;</code></td></tr>
+              <tr><td>События в camelCase</td><td><code>onclick</code></td><td><code>onClick</code></td></tr>
+              <tr><td>Один корневой тег</td><td>сколько угодно</td><td>один, либо <code>&lt;&gt;...&lt;/&gt;</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Последнее правило встречается чаще всего. Компонент возвращает один элемент. Если обёртка в виде <code>div</code> не нужна, используй пустой тег, он называется фрагментом и на страницу не попадает.</p>
+<pre><code class="js jsx">function Price() {
+  return (
+    &lt;&gt;
+      &lt;span className="price"&gt;7 900 ₽&lt;/span&gt;
+      &lt;span className="old-price"&gt;9 900 ₽&lt;/span&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Карточка товара в интернет-магазине</h3>
+          <p>В каталоге сотни товаров, и у всех карточек одинаковое устройство: фото, название, цена, кнопка. Карточку описывают одним компонентом и собирают из неё всю витрину. Когда дизайнер попросит поменять кнопку, правка в одном месте обновит все карточки сразу.</p>
+<pre><code class="js jsx">function ProductCard() {
+  const title = 'Наушники';
+  const price = 7900;
+
+  return (
+    &lt;article className="card"&gt;
+      &lt;img src="/img/headphones.jpg" alt={title} /&gt;
+      &lt;h3&gt;{title}&lt;/h3&gt;
+      &lt;p&gt;{price.toLocaleString('ru-RU')} ₽&lt;/p&gt;
+      &lt;button&gt;В корзину&lt;/button&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="index.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>На главную</a>
+        <a class="pager__next" href="props.html"><span>Дальше <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>Пропсы</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's React</span>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/react-demos.js"></script>
+</body>
+</html>

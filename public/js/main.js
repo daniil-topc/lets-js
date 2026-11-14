@@ -55,28 +55,30 @@ const TOKEN_RE = new RegExp(
   ].join('|'),
   'g'
 );
-const TOKEN_CLASSES = ['', 'com', 'str', 'num', 'kw', 'lit', 'fn'];
+const JSX_TAG = /(<\/?[A-Za-z][\w.]*|<\/?>|\/>|(?<![=\s])>)/;
+const JSX_RE = new RegExp(TOKEN_RE.source + '|' + JSX_TAG.source, 'g');
+const TOKEN_CLASSES = ['', 'com', 'str', 'num', 'kw', 'lit', 'fn', 'tag'];
 
 function escapeHtml(text) {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function highlight(code) {
+function highlight(code, re) {
   let html = '';
   let last = 0;
   let match;
-  TOKEN_RE.lastIndex = 0;
-  while ((match = TOKEN_RE.exec(code)) !== null) {
+  re.lastIndex = 0;
+  while ((match = re.exec(code)) !== null) {
     html += escapeHtml(code.slice(last, match.index));
     const group = match.findIndex((value, i) => i > 0 && value !== undefined);
     html += `<span class="t-${TOKEN_CLASSES[group]}">${escapeHtml(match[0])}</span>`;
-    last = TOKEN_RE.lastIndex;
+    last = re.lastIndex;
   }
   return html + escapeHtml(code.slice(last));
 }
 
 document.querySelectorAll('pre > code.js').forEach((block) => {
-  block.innerHTML = highlight(block.textContent);
+  block.innerHTML = highlight(block.textContent, block.classList.contains('jsx') ? JSX_RE : TOKEN_RE);
 });
 
 document.querySelectorAll('.article pre').forEach((pre) => {

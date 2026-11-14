@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Состояние и события — let's React</title>
+  <meta name="description" content="Состояние в React: события, хук useState, правила обновления и управляемые поля ввода.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <script src="../js/theme-init.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="let's React, на главную">let's</a>
+      <nav class="switch" aria-label="Справочники">
+        <a href="../index.html">JS</a>
+        <a href="index.html" aria-current="true">React</a>
+      </nav>
+      <nav class="nav" id="nav" aria-label="Главы">
+        <a href="components.html">Компоненты</a>
+        <a href="props.html">Пропсы</a>
+        <a href="state.html">Состояние</a>
+        <a href="render.html">Условия и списки</a>
+        <a href="effects.html">Эффекты</a>
+        <a href="data.html">Данные и хуки</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему"></button>
+        <button class="icon-btn burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page">
+    <aside class="toc" id="toc"></aside>
+
+    <article class="article">
+      <div class="chapter-head">
+        <span class="card__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="12" x="2" y="6" rx="6" ry="6"/><circle cx="8" cy="12" r="2"/></svg></span>
+        <p class="eyebrow">Глава 03</p>
+      </div>
+      <h1>Состояние и события</h1>
+      <p class="lead">Состояние это память компонента. Благодаря ему кнопка помнит, сколько раз её нажали, а поле знает, что в нём написано.</p>
+
+      <section id="events">
+        <h2>События</h2>
+        <p>Чтобы компонент реагировал на клик, передай функцию в пропс <code>onClick</code>. React вызовет её, когда человек нажмёт на элемент. Для ввода текста есть <code>onChange</code>, для отправки формы <code>onSubmit</code>.</p>
+<pre><code class="js jsx">function BuyButton() {
+  function handleClick() {
+    console.log('Покупка оформлена');
+  }
+
+  return &lt;button onClick={handleClick}&gt;Купить&lt;/button&gt;;
+}</code></pre>
+        <div class="note note--danger">
+          <p>Передавай саму функцию, без скобок: <code>onClick={handleClick}</code>. Запись <code>onClick={handleClick()}</code> вызовет функцию сразу при показе компонента, до всякого клика.</p>
+        </div>
+      </section>
+
+      <section id="usestate">
+        <h2>useState</h2>
+        <p>Обычная переменная внутри компонента ничего не помнит. При каждом показе функция запускается заново, и переменная создаётся с нуля. К тому же React не узнает, что она изменилась, и страницу не обновит.</p>
+        <p>Для данных, которые меняются со временем, есть состояние. Думай о нём как о памяти компонента. Функция <code>useState</code> возвращает пару: текущее значение и функцию, которая его меняет. Когда ты вызываешь эту функцию, React запоминает новое значение и перерисовывает компонент.</p>
+<pre><code class="js jsx">import { useState } from 'react';
+
+function Counter() {
+  //     значение  как менять        начальное значение
+  const [count,    setCount] = useState(0);
+
+  return (
+    &lt;button onClick={() =&gt; setCount(count + 1)}&gt;
+      Нажато: {count}
+    &lt;/button&gt;
+  );
+}</code></pre>
+        <p>Эта кнопка работает так же, как компонент <code>Counter</code> из примера.</p>
+        <div class="demo" data-demo="counter">
+          <p class="demo__title">Живой пример</p>
+          <div class="demo__row">
+            <button class="btn btn--primary btn--sm" type="button" data-role="plus">Нажато: 0</button>
+            <button class="btn btn--ghost btn--sm" type="button" data-role="reset">Сбросить</button>
+          </div>
+          <p class="demo__out">Компонент перерисован раз: <strong data-role="renders">1</strong></p>
+        </div>
+        <div class="note">
+          <p>Функции, имя которых начинается с <code>use</code>, называются хуками. Вызывай их только на верхнем уровне компонента. Внутри условий, циклов и вложенных функций хуки не работают.</p>
+        </div>
+      </section>
+
+      <section id="updates">
+        <h2>Как правильно обновлять состояние</h2>
+        <p>Состояние меняется только через функцию из пары. Если присвоить значение напрямую, React этого не заметит и экран останется прежним.</p>
+<pre><code class="js jsx">count = count + 1;      // экран не обновится
+setCount(count + 1);    // правильно</code></pre>
+        <p>С массивами и объектами правило то же. Создавай новую копию с изменениями, старую не трогай. Оператор <code>...</code> копирует содержимое в новый массив или объект.</p>
+<pre><code class="js jsx">const [items, setItems] = useState(['Хлеб']);
+const [user, setUser] = useState({ name: 'Аня', age: 25 });
+
+items.push('Молоко');                    // так нельзя
+setItems([...items, 'Молоко']);          // новый массив
+
+user.age = 26;                           // так нельзя
+setUser({ ...user, age: 26 });           // новый объект</code></pre>
+        <p>Если новое значение зависит от старого, передай в функцию стрелку. React подставит в неё самое свежее значение.</p>
+<pre><code class="js jsx">setCount((prev) =&gt; prev + 1);</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Кнопка «Нравится»</h3>
+          <p>Под постом в соцсети сердечко и число лайков. В состоянии лежит один факт: поставил человек лайк или нет. Цвет кнопки и число на ней вычисляются из этого факта при каждой перерисовке.</p>
+<pre><code class="js jsx">function LikeButton({ likes }) {
+  const [liked, setLiked] = useState(false);
+
+  return (
+    &lt;button
+      className={liked ? 'like is-liked' : 'like'}
+      onClick={() =&gt; setLiked(!liked)}
+    &gt;
+      {liked ? '♥' : '♡'} {likes + (liked ? 1 : 0)}
+    &lt;/button&gt;
+  );
+}</code></pre>
+          <div class="demo" data-demo="like">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <button class="btn btn--ghost btn--sm like-btn" type="button" aria-pressed="false">♡ 128</button>
+            </div>
+            <p class="demo__out">liked = <code data-role="state">false</code></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="inputs">
+        <h2>Поля ввода</h2>
+        <p>Текст в поле тоже хранят в состоянии. Поле показывает значение из состояния, а при каждом нажатии клавиши обновляет его. Такое поле называют управляемым: компонент в любой момент знает, что в нём написано.</p>
+<pre><code class="js jsx">function NameField() {
+  const [name, setName] = useState('');
+
+  return (
+    &lt;&gt;
+      &lt;input value={name} onChange={(e) =&gt; setName(e.target.value)} /&gt;
+      &lt;p&gt;Привет, {name || 'незнакомец'}!&lt;/p&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+
+        <div class="case">
+          <span class="case__label">Реальный кейс</span>
+          <h3>Счётчик символов под полем</h3>
+          <p>В поле для отзыва помещается 60 символов. Под ним написано, сколько ещё осталось, а кнопка отправки выключена, пока поле пустое. Отдельного состояния для счётчика нет: он считается из текста.</p>
+<pre><code class="js jsx">function Review() {
+  const [text, setText] = useState('');
+  const left = 60 - text.length;
+
+  return (
+    &lt;&gt;
+      &lt;input
+        value={text}
+        maxLength={60}
+        onChange={(e) =&gt; setText(e.target.value)}
+      /&gt;
+      &lt;p&gt;Осталось символов: {left}&lt;/p&gt;
+      &lt;button disabled={text.trim() === ''}&gt;Отправить&lt;/button&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+          <div class="demo" data-demo="chars">
+            <p class="demo__title">Живой пример</p>
+            <div class="demo__row">
+              <input class="input" type="text" maxlength="60" placeholder="Напиши отзыв" aria-label="Отзыв">
+              <button class="btn btn--primary btn--sm" type="button" disabled>Отправить</button>
+            </div>
+            <p class="demo__out" aria-live="polite">Осталось символов: 60</p>
+          </div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Соседние главы">
+        <a href="props.html"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Назад</span>Пропсы</a>
+        <a class="pager__next" href="render.html"><span>Дальше <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>Условия и списки</a>
+      </nav>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© 2026 let's React</span>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/react-demos.js"></script>
+</body>
+</html>
